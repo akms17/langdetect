@@ -21,11 +21,11 @@ object NGramProfileBuilder {
   }
 
 
-  // Extract the n-grams from a piece of text into a sequence. Spaces are represented as _.
+  // Extract the n-grams from a piece of text into a sequence. Spaces are represented as ~.
   def extractNgrams(text: String
                   , maxChars : Int
                   , cleanText: (String) => String ) : Seq[String] = {
-    val normalized = "_" + cleanText(text.toLowerCase).replace(" ","_") + "_"
+    val normalized = "~" + cleanText(text.toLowerCase).replace(" ","~") + "~"
     for {
       start <- 0 to normalized.length
       length <- 1 to maxChars

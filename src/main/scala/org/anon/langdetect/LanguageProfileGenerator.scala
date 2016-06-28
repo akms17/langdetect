@@ -15,11 +15,15 @@ object LanguageProfileGenerator extends App {
                 , maxChars: Int = 10) = {
     val dir = new File(inputDir)
     require(dir.isDirectory, "needed directory with language text examples")
+    val opDir = new File(outputDir)
+    if(!opDir.exists()){
+      opDir.mkdir()
+    }
     for (f <- dir.listFiles) {
       val language = f.getName
       val lines = Source.fromFile(f).getLines().mkString(" ")
       val profile = NGramProfileBuilder.build(lines, maxChars)
-      val outFile = new File(s"$outputDir/$language.lm")
+      val outFile = new File(opDir, s"$language.lm")
       new PrintWriter(outFile) {
         write(profile.take(300).mkString("\n"))
         close()

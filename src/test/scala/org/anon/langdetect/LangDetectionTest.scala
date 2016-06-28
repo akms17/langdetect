@@ -5,10 +5,10 @@ import org.scalatest.{FlatSpec, MustMatchers}
 import scala.io.Source
 
 class LangDetectionTest extends FlatSpec with MustMatchers {
-  val inputProfilesDir = "src/main/resources/profiles"
+  val inputProfilesDir = "src/test/resources/profiles"
   val testFilesLocation = "src/test/resources/articles"
 
-  val langdetect = new Langdetect(inputProfilesDir)
+  val langdetect = new LangDetect(inputProfilesDir)
 
   def textFromFile(file: String): String = Source.fromFile(file).getLines().mkString(" ")
 

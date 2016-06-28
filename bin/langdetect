@@ -1,0 +1,5 @@
+#!/bin/bash
+
+java -cp "$LANGDETECT_JAR/*" $JAVA_OPTS org.anon.langdetect.LangDetect $@
+
+

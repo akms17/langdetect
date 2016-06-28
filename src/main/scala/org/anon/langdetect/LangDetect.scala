@@ -3,7 +3,7 @@ package org.anon.langdetect
 import java.io.File
 
 import org.rogach.scallop.ScallopConf
-
+import org.log4s._
 import scala.io.Source
 
 
@@ -11,7 +11,9 @@ import scala.io.Source
  * Based of the simple approach by Cavnar et al  [http://www.let.rug.nl/vannoord/TextCat/textcat.pdf]
  * Needs proper tokenization and hence may not be the best for east asian languages.
  */
-class Langdetect(profilesDir: String) {
+class LangDetect(profilesDir: String)  {
+
+  private[this] val logger = getLogger
 
   val profiles = readProfiles(new File(profilesDir))
 
@@ -22,19 +24,23 @@ class Langdetect(profilesDir: String) {
                      , distance: (Profile, Profile) => Int = defaultDistance
                      ) : (String, Int) = {
     val textProfile = NGramProfileBuilder.build(text, maxChars).take(300)
-    profiles.map {
+    val profileScores = profiles.map {
       case(lang, prof) =>
         (lang, distance(textProfile, prof.filter(_.length<=maxChars)))
-    }.sortWith(termFreqComparator).last
+    }.sortWith(termFreqComparator)
+    logger.info(s"Profile Scores : ${profileScores.map(x=> (x._1, 1000.0/x._2.toDouble)).mkString(",")}")
+    profileScores.last
   }
 
   private def readProfiles(dir : File) : Seq[(String, Seq[String])] = {
-    dir.listFiles.map {
+    val profilesLoaded = dir.listFiles.map {
       f =>
         val languageName = f.getName.split('.').head
         val lines = Source.fromFile(f, "ISO-8859-1").getLines().toList
         languageName -> lines
     }.toSeq
+    logger.info(s"Language profiles loaded ${profilesLoaded.map(_._1).mkString(",")}")
+    profilesLoaded
   }
 
   private def defaultDistance(p1: Profile, p2: Profile) : Int = {
@@ -48,13 +54,14 @@ class Langdetect(profilesDir: String) {
 
 }
 
-object Langdetect extends App {
+object LangDetect extends App {
 
   val opts = new Opts(args)
 
-  val langdetect = new Langdetect(opts.profilesDir())
+  val langdetect = new LangDetect(opts.profilesDir())
   val input = Source.stdin.getLines().mkString(" ")
-  Console.out.println(langdetect.identifyLanguage(input, opts.maxChars()))
+  val result = langdetect.identifyLanguage(input, opts.maxChars())
+  Console.out.println(result._1)
 
 
   class Opts(args: Seq[String]) extends ScallopConf(args) {
