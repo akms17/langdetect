@@ -8,7 +8,7 @@ This is a simple ngram based language detector, based of the simple approach by 
 #### Building
 
 ```
-mvn clean package
+mvn clean package -Pshade
 ```
 
 This builds a shaded jar
